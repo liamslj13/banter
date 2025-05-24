@@ -64,12 +64,12 @@ Token::Token(const TokenType type, std::string lit, const int line)
     : type(type), lit(std::move(lit)), line(line) {}
 [[nodiscard]] std::string Token::toString() const {
     return "tok(type: " + tokenTypeToString(type) +
-           "literal: " + lit + ", line: " + std::to_string(line);
+           ", literal: " + lit + ", line: " + std::to_string(line) + ")";
 }
 
 // lexer implementations
 lex::lex(std::string &input)
- : input(std::move(input)), ch(' '), pos(0), readPos(0), line(1), linePos(0),
+ : input(std::move(input)), ch(' '), pos(0), readPos(0), line(1), linePos(1),
   keywords({
       {"function", TokenType::FUNCTION},
       {"if", TokenType::IF},
@@ -87,7 +87,7 @@ void lex::readChar() {
     if (pos >= input.size()) {
         ch = 0;
     } else {
-        ch = input[pos++];
+        ch = input[readPos];
     }
     pos = readPos;
     readPos++;
@@ -97,7 +97,7 @@ void lex::skipWhitespace() {
     while (ch == ' ' || ch == '\t' || ch == '\r' || ch == '\n') {
         if (ch == '\n') {
             line++;
-            linePos = 0;
+            linePos = 1;
         } else if (ch == ' ') {
             linePos++;
         }
@@ -132,6 +132,7 @@ std::string lex::readIdent() {
 
 std::string lex::readInt() {
     const int start = pos;
+    readChar();
     while (isdigit(ch)) {
         readChar();
     }
@@ -222,7 +223,7 @@ Token lex::nextToken() {
         case '"':
             tok = newToken(TokenType::STRING, readString(), line);
             break;
-        case '0':
+        case 0:
             tok.lit = "";
             tok.type = TokenType::EoF;
             tok.line = line;
@@ -251,6 +252,7 @@ Token lex::nextToken() {
             std::abort();
         }
     }
+
     readChar();
     return tok;
 }
