@@ -214,6 +214,9 @@ Token lex::nextToken() {
         case ';':
             tok = newToken(TokenType::SEMICOLON, std::string(1, ch), line);
             break;
+        case ':':
+            tok = newToken(TokenType::COLON, std::string(1, ch), line);
+            break;
         case ',':
             tok = newToken(TokenType::COMMA, std::string(1, ch), line);
             break;

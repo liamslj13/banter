@@ -31,6 +31,7 @@ enum struct TokenType {
     RBRACE,
 
     SEMICOLON,
+    COLON,
     COMMA,
     BANG,
     BAR,
