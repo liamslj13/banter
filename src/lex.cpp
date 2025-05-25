@@ -71,14 +71,18 @@ Token::Token(const TokenType type, std::string lit, const int line)
 lex::lex(std::string &input)
  : input(std::move(input)), ch(' '), pos(0), readPos(0), line(1), linePos(1),
   keywords({
-      {"function", TokenType::FUNCTION},
+      {"func", TokenType::FUNCTION},
       {"if", TokenType::IF},
       {"else", TokenType::ELSE},
       {"while", TokenType::WHILE},
       {"return", TokenType::RETURN},
       {"break", TokenType::BREAK},
-      {"TRUE", TokenType::TRUE},
-      {"FALSE", TokenType::FALSE},
+      {"true", TokenType::TRUE},
+      {"false", TokenType::FALSE},
+      {"int", TokenType::int_type},
+      {"str", TokenType::str_type},
+      {"bool", TokenType::bool_type},
+      {"arr", TokenType::arr_type},
   }) {
     readChar();
 }
@@ -167,6 +171,11 @@ Token lex::nextToken() {
     skipWhitespace();
     switch (ch) {
         case '=':
+            if (peekChar() == '=') {
+                readChar();
+                tok = newToken(TokenType::EQ, "==", line);
+                break;
+            }
             tok = newToken(TokenType::ASSIGN, std::string(1, ch), line);
             break;
         case '+':
@@ -209,12 +218,27 @@ Token lex::nextToken() {
             tok = newToken(TokenType::COMMA, std::string(1, ch), line);
             break;
         case '!':
+            if (peekChar() == '=') {
+                readChar();
+                tok = newToken(TokenType::NEQ, "!=", line);
+                break;
+            }
             tok = newToken(TokenType::BANG, std::string(1, ch), line);
             break;
         case '|':
+            if  (peekChar() == '|') {
+                readChar();
+                tok = newToken(TokenType::OR, "||", line);
+                break;
+            }
             tok = newToken(TokenType::BAR, std::string(1, ch), line);
             break;
         case '&':
+            if (peekChar() == '&') {
+                readChar();
+                tok = newToken(TokenType::AND, "&&", line);
+                break;
+            }
             tok  = newToken(TokenType::AMPERSAND, std::string(1, ch), line);
             break;
         case '.':
@@ -222,6 +246,12 @@ Token lex::nextToken() {
             break;
         case '"':
             tok = newToken(TokenType::STRING, readString(), line);
+            break;
+        case '>':
+            tok = newToken(TokenType::GT, std::string(1, ch), line);
+            break;
+        case '<':
+            tok = newToken(TokenType::LT, std::string(1, ch), line);
             break;
         case 0:
             tok.lit = "";
