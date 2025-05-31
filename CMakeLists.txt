@@ -8,7 +8,9 @@ enable_testing()
 add_executable(hos main.cpp
         src/lex.cpp
         src/h/lex.h
-        unit_tests/test_lexer.cpp)
+        unit_tests/test_lexer.cpp
+        src/ast.cpp
+        src/h/ast.h)
 
 find_package(LLVM REQUIRED CONFIG)
 include_directories(${LLVM_INCLUDE_DIRS})
