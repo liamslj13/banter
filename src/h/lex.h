@@ -55,6 +55,7 @@ enum struct TokenType {
     BREAK,
     TRUE,
     FALSE,
+    VAR_DECL,
 
     // keyword literals
     int_type,

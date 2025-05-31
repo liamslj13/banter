@@ -3,65 +3,279 @@
 #ifndef AST_H
 #define AST_H
 
-#include <memory>
 #include <string>
 #include <vector>
+#include "../src/h/lex.h"
 
-class ExprAST {
-public:
-    virtual ~ExprAST() = default;
+struct Node {
+    virtual ~Node() {
+    }
+
+    virtual std::string tokenLiteral() = 0;
+
+    virtual std::string toString() = 0;
+
+    virtual std::string type() = 0;
 };
 
-class IntExprAST : public ExprAST {
+struct Statement : Node {
+    virtual void statementNode() = 0;
+
+    std::string tokenLiteral() override = 0;
+
+    std::string toString() override = 0;
+
+    std::string type() override = 0;
+};
+
+struct Expression : Node {
+    virtual void expressionNode() = 0;
+
+    std::string tokenLiteral() override = 0;
+
+    std::string toString() override = 0;
+
+    std::string type() override = 0;
+};
+
+struct Program final : Node {
+    std::vector<Statement *> statements;
+
+    ~Program() override {
+        for (auto stmt: statements) {
+            delete stmt;
+        }
+    }
+
+    std::string tokenLiteral() override;
+
+    std::string toString() override;
+
+    std::string type() override;
+};
+
+struct Identifier : Expression {
+    Token tok;
+    std::string value;
+
+    std::string tokenLiteral() override { return tok.lit; }
+    std::string toString() override { return value; }
+    std::string type() override { return "identifier"; }
+};
+
+struct BlockStatement : Statement {
+    Token tok;
+    std::vector<Statement *> statements;
+
+    ~BlockStatement() override {
+        for (auto stmt: statements) {
+            delete stmt;
+        }
+    }
+
+    void statementNode() override {
+    }
+
+    std::string tokenLiteral() override { return tok.lit; }
+
+    std::string toString() override;
+
+    std::string type() override { return "block_statement"; }
+};
+
+struct IntLiteral : Expression {
+    Token tok;
     int value;
-public:
-    explicit IntExprAST(const int value) : value(value) {}
+
+    std::string tokenLiteral() override { return tok.lit; }
+    std::string toString() override { return std::to_string(value); }
+    std::string type() override { return "int_literal"; }
 };
 
-class VariableExprAST : public ExprAST {
-    std::string name;
-public:
-    explicit VariableExprAST(const std::string &name) : name(name) {}
+struct BoolLiteral : Expression {
+    Token tok;
+    bool value;
+
+    std::string tokenLiteral() override { return tok.lit; }
+    std::string toString() override { return value ? "true" : "false"; }
+    std::string type() override { return "bool_literal"; }
 };
 
-class BinaryExprAST : public ExprAST {
-    char op;
-    std::unique_ptr<ExprAST> lhs, rhs;
-public:
-    explicit BinaryExprAST(const char &op, std::unique_ptr<ExprAST> lhs,  std::unique_ptr<ExprAST> rhs)
-    :  op(op), lhs(std::move(lhs)), rhs(std::move(rhs)) {}
+struct StringLiteral : Expression {
+    Token tok;
+    std::string value;
+
+    std::string tokenLiteral() override { return tok.lit; }
+    std::string toString() override { return value; }
+    std::string type() override { return "string_literal"; }
 };
 
-class CallExprAST : public ExprAST {
-    std::string callee;
-    std::vector<std::unique_ptr<ExprAST>> args;
-public:
-    explicit CallExprAST(const std::string &callee, std::vector<std::unique_ptr<ExprAST>> args)
-        : callee(callee), args(std::move(args)) {}
+struct FuncLiteral : Expression {
+    Token tok;
+    std::vector<Identifier *> params;
+    BlockStatement *body;
+
+    ~FuncLiteral() override {
+        for (auto param: params) {
+            delete param;
+        }
+    }
+
+    std::string tokenLiteral() override { return tok.lit; }
+    std::string toString() override { return "func_literal"; }
+    std::string type() override { return "func_literal"; }
 };
 
-class PrototypeAST {
-    std::string name;
-    std::vector<std::string> args;
+struct CallExpression : Expression {
+    Token tok;
+    Expression *callee;
+    std::vector<Expression *> arguments;
 
-public:
-    explicit PrototypeAST(const std::string &name, std::vector<std::string> args)
-        : name(name), args(std::move(args)) {}
+    ~CallExpression() override {
+        for (auto argument: arguments) {
+            delete argument;
+        }
+        delete callee;
+    }
 
-    [[nodiscard]] const std::string &getName() const { return name; }
+    std::string tokenLiteral() override { return tok.lit; }
+    std::string type() override { return "call_expression"; }
+    std::string toString() override { return "call_expression"; }
 };
 
-class FunctionAST {
-    std::unique_ptr<PrototypeAST> proto;
-    std::unique_ptr<ExprAST> body;
+struct IndexExpression : Expression {
+    Token tok;
+    Expression *index;
+    Expression *array;
 
-public:
-    explicit FunctionAST(std::unique_ptr<PrototypeAST> proto, std::unique_ptr<ExprAST> body)
-        :  proto(std::move(proto)), body(std::move(body)) {}
+    std::string tokenLiteral() override { return tok.lit; }
+    std::string toString() override { return "index"; }
+    std::string type() override { return "index"; }
 };
 
+struct PrefixExpression : Expression {
+    Token tok;
+    std::string op;
+    Expression *rhs;
 
+    std::string tokenLiteral() override { return tok.lit; }
 
+    std::string toString() override;
+
+    std::string type() override { return "prefix_expression"; }
+};
+
+struct InfixExpression : Expression {
+    Token tok;
+    Expression *lhs;
+    Expression *rhs;
+    std::string op;
+
+    std::string tokenLiteral() override { return tok.lit; }
+
+    std::string toString() override;
+
+    std::string type() override { return "infix_expression"; }
+};
+
+struct IfExpression : Expression {
+    Token tok;
+    Expression *condition;
+    BlockStatement *consequence;
+    BlockStatement *alternative;
+
+    std::string tokenLiteral() override { return tok.lit; }
+
+    std::string toString() override;
+
+    std::string type() override { return "if_expression"; }
+};
+
+struct WhileExpression : Expression {
+    Token tok;
+    Expression *condition;
+    BlockStatement *body;
+
+    std::string tokenLiteral() override { return tok.lit; }
+
+    std::string toString() override;
+
+    std::string type() override { return "while_expression"; }
+};
+
+struct DeclareStatement : Statement {
+    Token tok;
+    Identifier *name;
+    Expression *value;
+
+    ~DeclareStatement() override {
+        delete value;
+    }
+
+    void statementNode() override {
+    }
+
+    std::string tokenLiteral() override { return tok.lit; }
+
+    std::string toString() override;
+
+    std::string type() override { return "declare"; }
+};
+
+struct ReferenceStatement : Statement {
+    Token tok;
+    Identifier *name;
+    Expression *value;
+
+    ~ReferenceStatement() override {
+        delete value;
+    }
+
+    void statementNode() override {
+    }
+
+    std::string tokenLiteral() override { return tok.lit; }
+
+    std::string toString() override;
+
+    std::string type() override { return "reference_statement"; }
+};
+
+struct ReturnStatement : Statement {
+    Token tok;
+    Expression *returnVal;
+
+    ~ReturnStatement() override {
+        delete returnVal;
+    }
+
+    void statementNode() override {
+    }
+
+    std::string tokenLiteral() override { return tok.lit; }
+
+    std::string toString() override;
+
+    std::string type() override { return "return_statement"; }
+};
+
+struct ExpressionStatement : Statement {
+    Token tok;
+    Expression *expression;
+
+    ~ExpressionStatement() override {
+        delete expression;
+    }
+
+    void statementNode() override {
+    }
+
+    std::string tokenLiteral() override { return tok.lit; }
+
+    std::string toString() override;
+
+    std::string type() override { return "expression_statement"; }
+};
 
 
 #endif //AST_H
