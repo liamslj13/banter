@@ -122,8 +122,23 @@ struct FuncLiteral : Expression {
     }
 
     std::string tokenLiteral() override { return tok.lit; }
-    std::string toString() override { return "func_literal"; }
+    std::string toString() override;
     std::string type() override { return "func_literal"; }
+};
+
+struct ArrayLiteral : Expression {
+    Token tok;
+    std::vector<Expression*> elements;
+
+    ~ArrayLiteral() override {
+        for (auto elem : elements) {
+            delete elem;
+        }
+    }
+
+    std::string tokenLiteral() override { return tok.lit; }
+    std::string toString() override;
+    std::string type() override { return "array_literal"; }
 };
 
 struct CallExpression : Expression {
@@ -140,8 +155,10 @@ struct CallExpression : Expression {
 
     std::string tokenLiteral() override { return tok.lit; }
     std::string type() override { return "call_expression"; }
-    std::string toString() override { return "call_expression"; }
+    std::string toString() override;
 };
+
+
 
 struct IndexExpression : Expression {
     Token tok;
@@ -149,7 +166,7 @@ struct IndexExpression : Expression {
     Expression *array;
 
     std::string tokenLiteral() override { return tok.lit; }
-    std::string toString() override { return "index"; }
+    std::string toString() override;
     std::string type() override { return "index"; }
 };
 
@@ -194,7 +211,7 @@ struct IfExpression : Expression {
 struct WhileExpression : Expression {
     Token tok;
     Expression *condition;
-    BlockStatement *body;
+    BlockStatement *consequence;
 
     std::string tokenLiteral() override { return tok.lit; }
 
