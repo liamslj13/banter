@@ -70,20 +70,14 @@ std::unique_ptr<DeclareStatement> parser::parseDeclareStatement() {
 
     // ensure a var declaration is accompanied by a type declaration
     // ie, for ident x, we say "store x : int = 5;"
+
+    // ^^^^ I got lazy and deleted that shit
     if (!expectPeek(TokenType::IDENT)) {
         delete stmt;
         return nullptr;
     }
     stmt->name->tok = curTok;
     stmt->name->value = curTok.lit;
-    if (!expectPeek(TokenType::COLON)) {
-        return nullptr;
-    }
-    nextToken();
-    if (!expectPeek(TokenType::arr_type) || !expectPeek(TokenType::int_type) || !expectPeek(TokenType::str_type) || !
-        expectPeek(TokenType::bool_type)) {
-        return nullptr;
-    }
     nextToken();
     if (!expectPeek(TokenType::ASSIGN)) {
         return nullptr;

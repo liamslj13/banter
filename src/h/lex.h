@@ -59,12 +59,6 @@ enum struct TokenType {
     FALSE,
     VAR_DECL,
 
-    // keyword literals
-    int_type,
-    str_type,
-    bool_type,
-    arr_type,
-
     ILLEGAL,
     EoF,
 };

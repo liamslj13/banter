@@ -84,10 +84,6 @@ lex::lex(std::string &input)
       {"break", TokenType::BREAK},
       {"true", TokenType::TRUE},
       {"false", TokenType::FALSE},
-      {"int", TokenType::int_type},
-      {"str", TokenType::str_type},
-      {"bool", TokenType::bool_type},
-      {"arr", TokenType::arr_type},
   }) {
     readChar();
 }
