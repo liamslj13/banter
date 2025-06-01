@@ -7,7 +7,7 @@ int main() {
 true false func if else while
 expr 4 + 5 = 7;
 ,!|&||.&&
-int str
+int str store
 )";
     lex lexer(src);
 
@@ -36,6 +36,7 @@ int str
     Token t22 = lexer.nextToken();
     Token t23 = lexer.nextToken();
     Token t24 = lexer.nextToken();
+    Token t25 = lexer.nextToken();
 
     assert(t1.line == 1);
     assert(t1.lit == "keywords");
@@ -132,6 +133,10 @@ int str
     assert(t24.line == 6);
     assert(t24.lit == "");
     assert(t24.type == TokenType::EoF);
+
+    assert(t25.line == 6);
+    assert(t25.lit == "store");
+    assert(t25.type == TokenType::VAR_DECL);
 
     std::cout << "All lexer tests pass" << std::endl;
     return 0;

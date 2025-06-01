@@ -7,8 +7,11 @@ enable_testing()
 
 add_executable(banter main.cpp
         src/lex.cpp
+        src/h/lex.h
         unit_tests/test_lexer.cpp
         src/ast.cpp
+        src/h/ast.h
+        src/h/parser.h
         src/parser.cpp)
 
 find_package(LLVM REQUIRED CONFIG)

@@ -5,11 +5,10 @@
 
 #include <string>
 #include <vector>
-#include "../src/h/lex.h"
+#include "../h/lex.h"
 
 struct Node {
-    virtual ~Node() {
-    }
+    virtual ~Node() = default;
 
     virtual std::string tokenLiteral() = 0;
 
@@ -39,19 +38,15 @@ struct Expression : Node {
 };
 
 struct Program final : Node {
-    std::vector<Statement *> statements;
+    std::vector<std::unique_ptr<Statement>> statements;
 
-    ~Program() override {
-        for (auto stmt: statements) {
-            delete stmt;
-        }
-    }
+    ~Program() override = default;
 
     std::string tokenLiteral() override;
 
     std::string toString() override;
 
-    std::string type() override;
+    std::string type() override { return "program"; }
 };
 
 struct Identifier : Expression {
@@ -65,13 +60,9 @@ struct Identifier : Expression {
 
 struct BlockStatement : Statement {
     Token tok;
-    std::vector<Statement *> statements;
+    std::vector<std::unique_ptr<Statement>> statements;
 
-    ~BlockStatement() override {
-        for (auto stmt: statements) {
-            delete stmt;
-        }
-    }
+    ~BlockStatement() override = default;
 
     void statementNode() override {
     }
@@ -94,7 +85,7 @@ struct IntLiteral : Expression {
 
 struct BoolLiteral : Expression {
     Token tok;
-    bool value;
+    bool value = false;
 
     std::string tokenLiteral() override { return tok.lit; }
     std::string toString() override { return value ? "true" : "false"; }
@@ -112,14 +103,10 @@ struct StringLiteral : Expression {
 
 struct FuncLiteral : Expression {
     Token tok;
-    std::vector<Identifier *> params;
-    BlockStatement *body;
+    std::vector<std::unique_ptr<Identifier>> params;
+    std::unique_ptr<BlockStatement> body;
 
-    ~FuncLiteral() override {
-        for (auto param: params) {
-            delete param;
-        }
-    }
+    ~FuncLiteral() override = default;
 
     std::string tokenLiteral() override { return tok.lit; }
     std::string toString() override;
@@ -128,13 +115,9 @@ struct FuncLiteral : Expression {
 
 struct ArrayLiteral : Expression {
     Token tok;
-    std::vector<Expression*> elements;
+    std::vector<std::unique_ptr<Expression>> elements;
 
-    ~ArrayLiteral() override {
-        for (auto elem : elements) {
-            delete elem;
-        }
-    }
+    ~ArrayLiteral() override = default;
 
     std::string tokenLiteral() override { return tok.lit; }
     std::string toString() override;
@@ -143,15 +126,10 @@ struct ArrayLiteral : Expression {
 
 struct CallExpression : Expression {
     Token tok;
-    Expression *callee;
-    std::vector<Expression *> arguments;
+    std::unique_ptr<Expression> callee;
+    std::vector<std::unique_ptr<Expression>> arguments;
 
-    ~CallExpression() override {
-        for (auto argument: arguments) {
-            delete argument;
-        }
-        delete callee;
-    }
+    ~CallExpression() override = default;
 
     std::string tokenLiteral() override { return tok.lit; }
     std::string type() override { return "call_expression"; }
@@ -162,8 +140,8 @@ struct CallExpression : Expression {
 
 struct IndexExpression : Expression {
     Token tok;
-    Expression *index;
-    Expression *array;
+    std::unique_ptr<Expression> index;
+    std::unique_ptr<Expression> array;
 
     std::string tokenLiteral() override { return tok.lit; }
     std::string toString() override;
@@ -173,7 +151,7 @@ struct IndexExpression : Expression {
 struct PrefixExpression : Expression {
     Token tok;
     std::string op;
-    Expression *rhs;
+    std::unique_ptr<Expression> rhs;
 
     std::string tokenLiteral() override { return tok.lit; }
 
@@ -184,8 +162,8 @@ struct PrefixExpression : Expression {
 
 struct InfixExpression : Expression {
     Token tok;
-    Expression *lhs;
-    Expression *rhs;
+    std::unique_ptr<Expression> lhs;
+    std::unique_ptr<Expression> rhs;
     std::string op;
 
     std::string tokenLiteral() override { return tok.lit; }
@@ -197,9 +175,9 @@ struct InfixExpression : Expression {
 
 struct IfExpression : Expression {
     Token tok;
-    Expression *condition;
-    BlockStatement *consequence;
-    BlockStatement *alternative;
+    std::unique_ptr<Expression> condition;
+    std::unique_ptr<BlockStatement> consequence;
+    std::unique_ptr<BlockStatement> alternative;
 
     std::string tokenLiteral() override { return tok.lit; }
 
@@ -210,8 +188,8 @@ struct IfExpression : Expression {
 
 struct WhileExpression : Expression {
     Token tok;
-    Expression *condition;
-    BlockStatement *consequence;
+    std::unique_ptr<Expression> condition;
+    std::unique_ptr<BlockStatement> consequence;
 
     std::string tokenLiteral() override { return tok.lit; }
 
@@ -222,13 +200,10 @@ struct WhileExpression : Expression {
 
 struct DeclareStatement : Statement {
     Token tok;
-    Identifier *name;
-    Expression *value;
+    std::unique_ptr<Identifier> name;
+    std::unique_ptr<Expression> value;
 
-    ~DeclareStatement() override {
-        delete value;
-    }
-
+    ~DeclareStatement() override = default;
     void statementNode() override {
     }
 
@@ -241,12 +216,10 @@ struct DeclareStatement : Statement {
 
 struct ReferenceStatement : Statement {
     Token tok;
-    Identifier *name;
-    Expression *value;
+    std::unique_ptr<Identifier> name;
+    std::unique_ptr<Expression> value;
 
-    ~ReferenceStatement() override {
-        delete value;
-    }
+    ~ReferenceStatement() override = default;
 
     void statementNode() override {
     }
@@ -260,14 +233,11 @@ struct ReferenceStatement : Statement {
 
 struct ReturnStatement : Statement {
     Token tok;
-    Expression *returnVal;
+    std::unique_ptr<Expression> returnVal;
 
-    ~ReturnStatement() override {
-        delete returnVal;
-    }
+    ~ReturnStatement() override = default;
 
-    void statementNode() override {
-    }
+    void statementNode() override {}
 
     std::string tokenLiteral() override { return tok.lit; }
 
@@ -278,11 +248,9 @@ struct ReturnStatement : Statement {
 
 struct ExpressionStatement : Statement {
     Token tok;
-    Expression *expression;
+    std::unique_ptr<Expression> expression;
 
-    ~ExpressionStatement() override {
-        delete expression;
-    }
+    ~ExpressionStatement() override = default;
 
     void statementNode() override {
     }

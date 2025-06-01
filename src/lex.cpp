@@ -2,12 +2,13 @@
 
 #include "../src/h/lex.h"
 
-std::string tokenTypeToString(const TokenType type) {
+std::string lex::tokenTypeToString(const TokenType type) {
     switch (type) {
         case TokenType::IDENT: return "IDENT";
         case TokenType::INT: return "INT";
         case TokenType::STRING: return "STRING";
         case TokenType::DECLARE: return "DECLARE";
+        case TokenType::VAR_DECL: return "VAR_DECL";
 
         case TokenType::ASSIGN: return "ASSIGN";
         case TokenType::ADD: return "ADD";
@@ -29,11 +30,14 @@ std::string tokenTypeToString(const TokenType type) {
         case TokenType::BAR: return "BAR";
         case TokenType::AMPERSAND: return "AMPERSAND";
         case TokenType::DOT: return "DOT";
+        case TokenType::COLON: return "COLON";
 
         case TokenType::GT: return "GT";
         case TokenType::LT: return "LT";
         case TokenType::EQ: return "EQ";
         case TokenType::NEQ: return "NEQ";
+        case TokenType::GTE: return "GTE";
+        case TokenType::LTE: return "LTE";
         case TokenType::AND: return "AND";
         case TokenType::OR: return "OR";
 
@@ -63,7 +67,7 @@ Token::Token() : type(TokenType::IDENT), line(1) {}
 Token::Token(const TokenType type, std::string lit, const int line)
     : type(type), lit(std::move(lit)), line(line) {}
 [[nodiscard]] std::string Token::toString() const {
-    return "tok(type: " + tokenTypeToString(type) +
+    return "tok(type: " + lex::tokenTypeToString(type) +
            ", literal: " + lit + ", line: " + std::to_string(line) + ")";
 }
 
@@ -71,7 +75,7 @@ Token::Token(const TokenType type, std::string lit, const int line)
 lex::lex(std::string &input)
  : input(std::move(input)), ch(' '), pos(0), readPos(0), line(1), linePos(1),
   keywords({
-      {"declare", TokenType::VAR_DECL},
+      {"store", TokenType::VAR_DECL},
       {"func", TokenType::FUNCTION},
       {"if", TokenType::IF},
       {"else", TokenType::ELSE},
@@ -252,9 +256,19 @@ Token lex::nextToken() {
             tok = newToken(TokenType::STRING, readString(), line);
             break;
         case '>':
+            if (peekChar() == '=') {
+                readChar();
+                tok = newToken(TokenType::GTE, ">=", line);
+                break;
+            }
             tok = newToken(TokenType::GT, std::string(1, ch), line);
             break;
         case '<':
+            if (peekChar() == '=') {
+                readChar();
+                tok = newToken(TokenType::LTE, "<=", line);
+                break;
+            }
             tok = newToken(TokenType::LT, std::string(1, ch), line);
             break;
         case 0:

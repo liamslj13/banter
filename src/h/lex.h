@@ -42,6 +42,8 @@ enum struct TokenType {
     GT,
     LT,
     EQ,
+    LTE,
+    GTE,
     NEQ,
     AND,
     OR,
@@ -84,6 +86,8 @@ class lex {
     std::unordered_map<std::string, TokenType> keywords;
 
 public:
+
+    static std::string tokenTypeToString(const TokenType type);
     explicit lex(std::string &input);
     void readChar();
     void skipWhitespace();
