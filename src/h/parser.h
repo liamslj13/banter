@@ -11,9 +11,9 @@
 
 struct parser;
 
-typedef Expression * (parser::*PrefixParseFn)();
+typedef std::unique_ptr<Expression> (parser::*PrefixParseFn)();
 
-typedef Expression * (parser::*InfixParseFn)(Expression *);
+typedef std::unique_ptr<Expression> (parser::*InfixParseFn)(std::unique_ptr<Expression>);
 
 enum Precedence {
     LOWEST,
@@ -29,64 +29,64 @@ enum Precedence {
 extern std::unordered_map<TokenType, Precedence> precedence_map;
 
 struct parser {
-    void New(lex &l);
+    void New(const lex &l);
 
     std::vector<std::string> Errors() { return errors; }
 
-    Program *parseProgram();
+    std::unique_ptr<Program> parseProgram();
 
 private:
     void nextToken();
 
     bool expectPeek(const TokenType &tt);
 
-    Precedence peekPrecedence();
+    [[nodiscard]] Precedence peekPrecedence() const;
 
-    Precedence curPrecedence();
+    [[nodiscard]] Precedence curPrecedence() const;
 
-    Statement *parseStatement();
+    std::unique_ptr<Statement> parseStatement();
 
-    DeclareStatement *parseDeclareStatement();
+    std::unique_ptr<DeclareStatement> parseDeclareStatement();
 
-    ReferenceStatement *parseReferenceStatement();
+    std::unique_ptr<ReferenceStatement> parseReferenceStatement();
 
-    ReturnStatement *parseReturnStatement();
+    std::unique_ptr<ReturnStatement> parseReturnStatement();
 
-    ExpressionStatement *parseExpressionStatement();
+    std::unique_ptr<ExpressionStatement> parseExpressionStatement();
 
-    BlockStatement *parseBlockStatement();
+    std::unique_ptr<BlockStatement> parseBlockStatement();
 
-    Expression *parseExpression(Precedence precedence);
+    std::unique_ptr<Expression> parseExpression(Precedence precedence);
 
-    Expression *parseIdentifier();
+    std::unique_ptr<Expression> parseIdentifier();
 
-    Expression *parseIntegerLiteral();
+    std::unique_ptr<Expression> parseIntegerLiteral();
 
-    Expression *parseStringLiteral();
+    std::unique_ptr<Expression> parseStringLiteral();
 
-    Expression *parsePrefixExpression();
+    std::unique_ptr<Expression> parsePrefixExpression();
 
-    Expression *parseBoolean();
+    std::unique_ptr<Expression> parseBoolean();
 
-    std::vector<Identifier *> parseFunctionParameters();
+    std::vector<std::unique_ptr<Identifier>> parseFunctionParameters();
 
-    Expression *parseFunctionLiteral();
+    std::unique_ptr<Expression> parseFunctionLiteral();
 
-    Expression *parseArrayLiteral();
+    std::unique_ptr<Expression> parseArrayLiteral();
 
-    Expression *parseGroupedExpression();
+    std::unique_ptr<Expression> parseGroupedExpression();
 
-    Expression *parseIfExpression();
+    std::unique_ptr<Expression> parseIfExpression();
 
-    Expression *parseWhileExpression();
+    std::unique_ptr<Expression> parseWhileExpression();
 
-    std::vector<Expression *> parseExpressionList();
+    std::vector<std::unique_ptr<Expression>> parseExpressionList();
 
-    Expression *parseCallExpression(Expression *function);
+    std::unique_ptr<Expression> parseCallExpression(std::unique_ptr<Expression> callee);
 
-    Expression *parseIndexExpression(Expression *array);
+    std::unique_ptr<Expression> parseIndexExpression(std::unique_ptr<Expression> array);
 
-    Expression *parseInfixExpression(Expression *lhs);
+    std::unique_ptr<Expression> parseInfixExpression(std::unique_ptr<Expression> lhs);
 
     void noPrefixParseFnError(TokenType tt);
 
