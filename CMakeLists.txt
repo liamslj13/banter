@@ -12,7 +12,11 @@ add_executable(banter main.cpp
         src/ast.cpp
         src/h/ast.h
         src/h/parser.h
-        src/parser.cpp)
+        src/parser.cpp
+        src/codegen/banterEnv.h
+        src/codegen/codegen.cpp
+        unit_tests/test_ast.cpp
+        unit_tests/test_parser.cpp)
 
 find_package(LLVM REQUIRED CONFIG)
 include_directories(${LLVM_INCLUDE_DIRS})
