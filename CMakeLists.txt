@@ -24,6 +24,3 @@ add_definitions(${LLVM_DEFINITIONS})
 
 llvm_map_components_to_libnames(LLVM_LIBS core support)
 target_link_libraries(banter ${LLVM_LIBS})
-
-
-

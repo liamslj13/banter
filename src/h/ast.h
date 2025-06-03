@@ -52,12 +52,14 @@ struct Program : Node {
     std::string toString() override;
     std::string type() override { return "program"; }
 
-    llvm::Value *codeGen() override = 0;
+    llvm::Value *codeGen() override;
 };
 
 struct Identifier : Expression {
     Token tok;
     std::string value;
+
+    void expressionNode() override {}
 
     std::string tokenLiteral() override { return tok.lit; }
     std::string toString() override { return value; }
@@ -75,12 +77,14 @@ struct BlockStatement : Statement {
     std::string toString() override;
     std::string type() override { return "block_statement"; }
 
-    llvm::Value *codeGen() override = 0;
+    llvm::Value *codeGen() override;
 };
 
 struct IntLiteral : Expression {
     Token tok;
     int value;
+
+    void expressionNode() override {}
 
     std::string tokenLiteral() override { return tok.lit; }
     std::string toString() override { return std::to_string(value); }
@@ -93,6 +97,8 @@ struct BoolLiteral : Expression {
     Token tok;
     bool value = false;
 
+    void expressionNode() override {}
+
     std::string tokenLiteral() override { return tok.lit; }
     std::string toString() override { return value ? "true" : "false"; }
     std::string type() override { return "bool_literal"; }
@@ -103,6 +109,8 @@ struct BoolLiteral : Expression {
 struct StringLiteral : Expression {
     Token tok;
     std::string value;
+
+    void expressionNode() override {}
 
     std::string tokenLiteral() override { return tok.lit; }
     std::string toString() override { return value; }
@@ -117,6 +125,7 @@ struct FuncLiteral : Expression {
     std::unique_ptr<BlockStatement> body;
 
     ~FuncLiteral() override = default;
+    void expressionNode() override {}
 
     std::string tokenLiteral() override { return tok.lit; }
     std::string toString() override;
@@ -130,12 +139,13 @@ struct ArrayLiteral : Expression {
     std::vector<std::unique_ptr<Expression>> elements;
 
     ~ArrayLiteral() override = default;
+    void expressionNode() override {}
 
     std::string tokenLiteral() override { return tok.lit; }
     std::string toString() override;
     std::string type() override { return "array_literal"; }
 
-    llvm::Value *codeGen() override = 0; // todo
+    llvm::Value *codeGen() override; // todo
 };
 
 struct CallExpression : Expression {
@@ -144,26 +154,27 @@ struct CallExpression : Expression {
     std::vector<std::unique_ptr<Expression>> arguments;
 
     ~CallExpression() override = default;
+    void expressionNode() override {}
 
     std::string tokenLiteral() override { return tok.lit; }
     std::string type() override { return "call_expression"; }
     std::string toString() override;
 
-    llvm::Value *codeGen() override = 0; // todo
+    llvm::Value *codeGen() override; // todo
 };
-
-
 
 struct IndexExpression : Expression {
     Token tok;
     std::unique_ptr<Expression> index;
     std::unique_ptr<Expression> array;
 
+    void expressionNode() override {}
+
     std::string tokenLiteral() override { return tok.lit; }
     std::string toString() override;
     std::string type() override { return "index"; }
 
-    llvm::Value *codeGen() override = 0; // todo
+    llvm::Value *codeGen() override; // todo
 };
 
 struct PrefixExpression : Expression {
@@ -171,11 +182,13 @@ struct PrefixExpression : Expression {
     std::string op;
     std::unique_ptr<Expression> rhs;
 
+    void expressionNode() override {}
+
     std::string tokenLiteral() override { return tok.lit; }
     std::string toString() override;
     std::string type() override { return "prefix_expression"; }
 
-    llvm::Value *codeGen() override = 0;
+    llvm::Value *codeGen() override;
 };
 
 struct InfixExpression : Expression {
@@ -184,11 +197,13 @@ struct InfixExpression : Expression {
     std::unique_ptr<Expression> rhs;
     std::string op;
 
+    void expressionNode() override {}
+
     std::string tokenLiteral() override { return tok.lit; }
     std::string toString() override;
     std::string type() override { return "infix_expression"; }
 
-    llvm::Value *codeGen() override = 0; // todo
+    llvm::Value *codeGen() override; // todo
 };
 
 struct IfExpression : Expression {
@@ -197,11 +212,13 @@ struct IfExpression : Expression {
     std::unique_ptr<BlockStatement> consequence;
     std::unique_ptr<BlockStatement> alternative;
 
+    void expressionNode() override {}
+
     std::string tokenLiteral() override { return tok.lit; }
     std::string toString() override;
     std::string type() override { return "if_expression"; }
 
-    llvm::Value *codeGen() override = 0; // todo
+    llvm::Value *codeGen() override; // todo
 };
 
 struct WhileExpression : Expression {
@@ -209,11 +226,13 @@ struct WhileExpression : Expression {
     std::unique_ptr<Expression> condition;
     std::unique_ptr<BlockStatement> consequence;
 
+    void expressionNode() override {}
+
     std::string tokenLiteral() override { return tok.lit; }
     std::string toString() override;
     std::string type() override { return "while_expression"; }
 
-    llvm::Value *codeGen() override = 0; // todo
+    llvm::Value *codeGen() override; // todo
 };
 
 struct DeclareStatement : Statement {
@@ -222,8 +241,7 @@ struct DeclareStatement : Statement {
     std::unique_ptr<Expression> value;
 
     ~DeclareStatement() override = default;
-    void statementNode() override {
-    }
+    void statementNode() override {}
 
     std::string tokenLiteral() override { return tok.lit; }
     std::string toString() override;
@@ -244,7 +262,7 @@ struct ReferenceStatement : Statement {
     std::string toString() override;
     std::string type() override { return "reference_statement"; }
 
-    llvm::Value *codeGen() override = 0; // todo
+    llvm::Value *codeGen() override; // todo
 };
 
 struct ReturnStatement : Statement {
@@ -258,7 +276,7 @@ struct ReturnStatement : Statement {
     std::string toString() override;
     std::string type() override { return "return_statement"; }
 
-    llvm::Value *codeGen() override = 0;
+    llvm::Value *codeGen() override;
 };
 
 struct ExpressionStatement : Statement {
@@ -272,7 +290,7 @@ struct ExpressionStatement : Statement {
     std::string toString() override;
     std::string type() override { return "expression_statement"; }
 
-    llvm::Value *codeGen() override = 0; // todo
+    llvm::Value *codeGen() override; // todo
 };
 
 

@@ -73,7 +73,6 @@ std::unique_ptr<DeclareStatement> parser::parseDeclareStatement() {
 
     // ^^^^ I got lazy and deleted that shit
     if (!expectPeek(TokenType::IDENT)) {
-        delete stmt;
         return nullptr;
     }
     stmt->name->tok = curTok;
@@ -95,13 +94,11 @@ std::unique_ptr<ReferenceStatement> parser::parseReferenceStatement() {
     stmt->tok = curTok;
 
     if (!expectPeek(TokenType::IDENT)) {
-        delete stmt;
         return nullptr;
     }
     stmt->name->tok = curTok;
     stmt->name->value = curTok.lit;
     if (!expectPeek(TokenType::ASSIGN)) {
-        delete stmt;
         return nullptr;
     }
     nextToken();
@@ -145,7 +142,7 @@ std::unique_ptr<BlockStatement> parser::parseBlockStatement() {
     while (curTok.type != TokenType::RBRACE && curTok.type != TokenType::EoF) {
         auto stmt = parseStatement();
         if (stmt != nullptr) {
-            block->statements.push_back(stmt);
+            block->statements.push_back(std::move(stmt));
         }
         nextToken();
     }
@@ -236,7 +233,7 @@ std::vector<std::unique_ptr<Identifier> > parser::parseFunctionParameters() {
     auto ident = std::make_unique<Identifier>();
     ident->tok = curTok;
     ident->value = curTok.lit;
-    params.push_back(ident);
+    params.push_back(std::move(ident));
 
     while (peekTok.type == TokenType::COMMA) {
         nextToken();
@@ -244,7 +241,7 @@ std::vector<std::unique_ptr<Identifier> > parser::parseFunctionParameters() {
         ident = std::make_unique<Identifier>();
         ident->tok = curTok;
         ident->value = curTok.lit;
-        params.push_back(ident);
+        params.push_back(std::move(ident));
     }
 
     if (!expectPeek(TokenType::RPAREN)) {

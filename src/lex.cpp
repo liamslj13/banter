@@ -49,11 +49,6 @@ std::string lex::tokenTypeToString(const TokenType type) {
         case TokenType::TRUE: return "TRUE";
         case TokenType::FALSE: return "FALSE";
 
-        case TokenType::int_type: return "int_type";
-        case TokenType::str_type: return "str_type";
-        case TokenType::bool_type: return "bool_type";
-        case TokenType::arr_type: return "arr_type";
-
         case TokenType::ILLEGAL: return "ILLEGAL";
         case TokenType::EoF: return "EoF";
         default:

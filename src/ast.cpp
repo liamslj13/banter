@@ -12,7 +12,7 @@ std::string Program::tokenLiteral() {
 
 std::string Program::toString() {
     std::string res;
-    for (auto stmt : statements) {
+    for (const auto& stmt : statements) {
         res += stmt->toString() + "\n";
     }
     return res;
@@ -57,7 +57,7 @@ std::string ExpressionStatement::toString() {
 
 std::string BlockStatement::toString() {
     std::string res = "{ ";
-    for (auto stmt : statements) {
+    for (const auto& stmt : statements) {
         res += stmt->toString() + " ";
     }
     res += "}";
@@ -89,7 +89,7 @@ std::string WhileExpression::toString() {
 
 std::string FuncLiteral::toString() {
     std::string res = tokenLiteral() + " (";
-    for (auto param : params) {
+    for (const auto& param : params) {
         res += param->toString() + ", ";
     }
     res += ")";
@@ -99,7 +99,7 @@ std::string FuncLiteral::toString() {
 
 std::string ArrayLiteral::toString() {
     std::string res = "[";
-    for (auto element : elements) {
+    for (const auto& element : elements) {
         res += element->toString() + ", ";
     }
     res += "]";
@@ -108,7 +108,7 @@ std::string ArrayLiteral::toString() {
 
 std::string CallExpression::toString() {
     std::string res = callee->toString() + "(";
-    for (auto arg : arguments) {
+    for (const auto& arg : arguments) {
         res += arg->toString() + ", ";
     }
     res += ")";
@@ -118,9 +118,3 @@ std::string CallExpression::toString() {
 std::string IndexExpression::toString() {
     return "(" + array->toString() + "[" + index->toString() + "])";
 }
-
-
-
-
-
-
