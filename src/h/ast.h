@@ -245,7 +245,7 @@ struct DeclareStatement : Statement {
 
     std::string tokenLiteral() override { return tok.lit; }
     std::string toString() override;
-    std::string type() override { return "declare"; }
+    std::string type() override { return "declare_statement"; }
 
     llvm::Value *codeGen() override;
 };

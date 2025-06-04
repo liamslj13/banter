@@ -8,7 +8,7 @@ struct lexerTests {
 true false func if else while
 expr 4 + 5 = 7;
 ,!|&||.&&
-store
+var
 )";
         lex lexer(src);
 
@@ -122,7 +122,7 @@ store
         assert(t21.type == TokenType::AND);
 
         assert(t22.line == 5);
-        assert(t22.lit == "store");
+        assert(t22.lit == "var");
         assert(t22.type == TokenType::VAR_DECL);
 
         assert(t23.line == 6);

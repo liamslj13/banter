@@ -397,8 +397,7 @@ void parser::noPrefixParseFnError(TokenType tt) {
     errors.push_back("no prefix parse function for " + lex::tokenTypeToString(tt));
 }
 
-void parser::New(const lex &l) {
-    this->l = l;
+parser::parser(const lex &l) : l(l) {
 
     prefixParseFns[TokenType::IDENT] = &parser::parseIdentifier;
     prefixParseFns[TokenType::INT] = &parser::parseIntegerLiteral;

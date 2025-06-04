@@ -70,7 +70,7 @@ Token::Token(const TokenType type, std::string lit, const int line)
 lex::lex(std::string &input)
  : input(std::move(input)), ch(' '), pos(0), readPos(0), line(1), linePos(1),
   keywords({
-      {"store", TokenType::VAR_DECL},
+      {"var", TokenType::VAR_DECL},
       {"func", TokenType::FUNCTION},
       {"if", TokenType::IF},
       {"else", TokenType::ELSE},

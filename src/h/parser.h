@@ -29,7 +29,7 @@ enum Precedence {
 extern std::unordered_map<TokenType, Precedence> precedence_map;
 
 struct parser {
-    void New(const lex &l);
+    explicit parser(const lex &l);
 
     std::vector<std::string> Errors() { return errors; }
 

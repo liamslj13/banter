@@ -81,7 +81,7 @@ class lex {
 
 public:
 
-    static std::string tokenTypeToString(const TokenType type);
+    static std::string tokenTypeToString(TokenType type);
     explicit lex(std::string &input);
     void readChar();
     void skipWhitespace();
